@@ -848,7 +848,37 @@ clean:
 clean-altera: clean
 	$(MAKE) -C corev_apu/altera clean
 
+verilate-core:
+	@echo "[Verilator] Building CVA6 Core Model"
+	export TARGET_CFG=$(TARGET_CFG) && export CVA6_REPO_DIR=$(CVA6_REPO_DIR) && \
+	$(verilator) --no-timing verilator_config.vlt \
+                    -f core/Flist.cva6 \
+                    core/cva6_rvfi.sv \
+                    corev_apu/tb/cva6_top.sv \
+                    $(filter-out %.vhd, $(ariane_pkg)) \
+                    $(filter-out core/fpu_wrap.sv, $(filter-out %.vhd, $(filter-out %_config_pkg.sv, $(src)))) \
+                    +define+$(defines)$(if $(TRACE_FAST),+VM_TRACE)$(if $(TRACE_COMPACT),+VM_TRACE+VM_TRACE_FST) \
+                    +incdir+corev_apu/axi_node \
+                    --unroll-count 256 \
+                    -Wall \
+                    -Werror-PINMISSING \
+                    -Werror-IMPLICIT \
+                    -Wno-fatal \
+                    -Wno-PINCONNECTEMPTY \
+                    -Wno-ASSIGNDLY \
+                    -Wno-DECLFILENAME \
+                    -Wno-UNUSED \
+                    -Wno-UNOPTFLAT \
+                    -Wno-BLKANDNBLK \
+                    -Wno-style \
+                    --cc \
+                    $(list_incdir) --top-module cva6_top \
+                    --threads-dpi none \
+                    --Mdir work-ver-core -O3
+	cd work-ver-core && $(MAKE) -j${NUM_JOBS} -f Vcva6_top.mk
+
 .PHONY:
+	verilate-core \
 	build sim sim-verilate clean                                              \
 	$(riscv-asm-tests) $(addsuffix _verilator,$(riscv-asm-tests))             \
 	$(riscv-benchmarks) $(addsuffix _verilator,$(riscv-benchmarks))           \
