@@ -858,6 +858,8 @@ verilate-core:
                     $(filter-out %.vhd, $(ariane_pkg)) \
                     $(filter-out core/fpu_wrap.sv, $(filter-out %.vhd, $(filter-out %_config_pkg.sv, $(src)))) \
                     +define+$(defines)$(if $(TRACE_FAST),+VM_TRACE)$(if $(TRACE_COMPACT),+VM_TRACE+VM_TRACE_FST) \
+                    $(if $(TRACE_COMPACT), --trace-fst) \
+                    $(if $(TRACE_FAST), --trace) \
                     +incdir+corev_apu/axi_node \
                     --unroll-count 256 \
                     -Wall \
