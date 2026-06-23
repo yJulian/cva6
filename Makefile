@@ -53,9 +53,16 @@ $(warning must set CVA6_REPO_DIR to point at the root of CVA6 sources -- doing i
 export CVA6_REPO_DIR = $(abspath $(root-dir))
 endif
 
+# Number of threads for Verilator compilation and simulation
+NUM_THREADS ?= 1
+
 support_verilator_4 := $(shell ($(verilator) --version | grep '4\.') > /dev/null 2>&1 ; echo $$?)
 ifeq ($(support_verilator_4), 0)
 	verilator_threads := 1
+endif
+
+ifneq ($(NUM_THREADS), 1)
+	verilator_threads := $(NUM_THREADS)
 endif
 # Location of Verilator headers and optional source files
 VL_INC_DIR := $(VERILATOR_INSTALL_DIR)/share/verilator/include
@@ -876,6 +883,7 @@ verilate-core:
                     --cc \
                     $(list_incdir) --top-module cva6_top \
                     --threads-dpi none \
+                    $(if $(verilator_threads), --threads $(verilator_threads)) \
                     --Mdir work-ver-core -O3
 	cd work-ver-core && $(MAKE) -j${NUM_JOBS} -f Vcva6_top.mk
 
