@@ -117,6 +117,7 @@ module cva6_top import ariane_pkg::*; (
     .noc_resp_i           ( noc_resp_i                )
   );
 
+/*
   always @(posedge clk_i) begin
     if (rst_ni && (noc_req_ar_valid_o || noc_resp_r_valid_i || i_ariane.i_cva6.gen_cache_wt.i_cache_subsystem.i_adapter.i_rd_icache_id.pop_i)) begin
       $display("[SV MON] posedge clk: ar_valid=%b ar_ready=%b push_i=%b | r_valid=%b r_ready=%b r_last=%b pop_i=%b empty_o=%b",
@@ -130,5 +131,6 @@ module cva6_top import ariane_pkg::*; (
                i_ariane.i_cva6.gen_cache_wt.i_cache_subsystem.i_adapter.i_rd_icache_id.empty_o);
     end
   end
+*/
 
 endmodule
