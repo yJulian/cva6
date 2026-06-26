@@ -32,6 +32,8 @@ verilator             ?= verilator
 target-options ?=
 # additional defines
 defines        ?=
+# Checkpoint support for verilated core (0 = disabled, 1 = enabled)
+SAVABLE        ?= 0
 # test name for torture runs (binary name)
 test-location  ?= output/test
 # set to either nothing or -log
@@ -859,6 +861,7 @@ verilate-core:
 	@echo "[Verilator] Building CVA6 Core Model"
 	export TARGET_CFG=$(TARGET_CFG) && export CVA6_REPO_DIR=$(CVA6_REPO_DIR) && \
 	$(verilator) --no-timing verilator_config.vlt \
+                    $(if $(filter 1,$(SAVABLE)),--savable) \
                     -f core/Flist.cva6 \
                     core/cva6_rvfi.sv \
                     corev_apu/tb/cva6_top.sv \
@@ -894,6 +897,7 @@ verilate-core:
 		-I../gem5/src/cpu/cva6 \
 		$(if $(TRACE_FAST),-DVM_TRACE=1) \
 		$(if $(TRACE_COMPACT),-DVM_TRACE=1 -DVM_TRACE_FST=1) \
+		$(if $(filter 1,$(SAVABLE)),-DVM_SAVABLE=1) \
 		../gem5/src/cpu/cva6/cva6_rtl_core_impl.cc \
 		-Wl,--whole-archive work-ver-core/libVcva6_top.a work-ver-core/libverilated.a -Wl,--no-whole-archive
 
