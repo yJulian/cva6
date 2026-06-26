@@ -47,7 +47,8 @@ module cva6_top import ariane_pkg::*; (
   input  logic [63:0]                  noc_resp_r_data_i,
   input  logic                         noc_resp_r_last_i,
   input  logic [1:0]                   noc_resp_r_resp_i,
-  output logic                         noc_req_r_ready_o
+  output logic                         noc_req_r_ready_o,
+  output logic                         ebreak_o
 );
 
   localparam config_pkg::cva6_cfg_t CVA6Cfg = build_config_pkg::build_config(cva6_config_pkg::cva6_cfg);
@@ -76,6 +77,10 @@ module cva6_top import ariane_pkg::*; (
   assign noc_req_ar_prot_o  = noc_req_o.ar.prot;
 
   assign noc_req_r_ready_o  = noc_req_o.r_ready;
+
+  // Detect ebreak instruction commit (Breakpoint exception has cause 3)
+  assign ebreak_o = i_ariane.i_cva6.commit_stage_i.exception_o.valid && 
+                    (i_ariane.i_cva6.commit_stage_i.exception_o.cause == 3);
 
   // Pack inputs to core
   always_comb begin
