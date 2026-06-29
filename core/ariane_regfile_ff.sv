@@ -45,7 +45,7 @@ module ariane_regfile #(
   localparam ADDR_WIDTH = 5;
   localparam NUM_WORDS = 2 ** ADDR_WIDTH;
 
-  logic [            NUM_WORDS-1:0][DATA_WIDTH-1:0] mem;
+  logic [            NUM_WORDS-1:0][DATA_WIDTH-1:0] mem /* verilator public */;
   logic [CVA6Cfg.NrCommitPorts-1:0][ NUM_WORDS-1:0] we_dec;
 
 
