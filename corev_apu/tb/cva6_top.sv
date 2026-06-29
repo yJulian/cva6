@@ -48,9 +48,11 @@ module cva6_top import ariane_pkg::*; (
   input  logic                         noc_resp_r_last_i,
   input  logic [1:0]                   noc_resp_r_resp_i,
   output logic                         noc_req_r_ready_o,
+
+  // Debug Channels
   output logic                         ebreak_o,
   output logic                         illegal_instr_o,
-  output logic [63:0]                  illegal_instr_pc_o
+  output logic [63:0]                  program_counter
 );
 
   localparam config_pkg::cva6_cfg_t CVA6Cfg = build_config_pkg::build_config(cva6_config_pkg::cva6_cfg);
@@ -79,15 +81,6 @@ module cva6_top import ariane_pkg::*; (
   assign noc_req_ar_prot_o  = noc_req_o.ar.prot;
 
   assign noc_req_r_ready_o  = noc_req_o.r_ready;
-
-  // Detect ebreak instruction commit (Breakpoint exception has cause 3)
-  assign ebreak_o = i_ariane.i_cva6.commit_stage_i.exception_o.valid && 
-                    (i_ariane.i_cva6.commit_stage_i.exception_o.cause == 3);
-
-  // Detect illegal instruction exception commit (Illegal instruction exception has cause 2)
-  assign illegal_instr_o = i_ariane.i_cva6.commit_stage_i.exception_o.valid && 
-                           (i_ariane.i_cva6.commit_stage_i.exception_o.cause == 2);
-  assign illegal_instr_pc_o = 64'(i_ariane.i_cva6.commit_stage_i.commit_instr_i[0].pc);
 
   // Pack inputs to core
   always_comb begin
@@ -144,5 +137,15 @@ module cva6_top import ariane_pkg::*; (
     end
   end
 */
+
+  // Debug signals
+  // Detect ebreak instruction commit (Breakpoint exception has cause 3)
+  assign ebreak_o = i_ariane.i_cva6.commit_stage_i.exception_o.valid && 
+                    (i_ariane.i_cva6.commit_stage_i.exception_o.cause == 3);
+
+  // Detect illegal instruction exception commit (Illegal instruction exception has cause 2)
+  assign illegal_instr_o = i_ariane.i_cva6.commit_stage_i.exception_o.valid && 
+                           (i_ariane.i_cva6.commit_stage_i.exception_o.cause == 2);
+  assign program_counter = 64'(i_ariane.i_cva6.commit_stage_i.commit_instr_i[0].pc);
 
 endmodule
